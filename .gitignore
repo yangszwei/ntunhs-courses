@@ -1,0 +1,7 @@
+# macOS system file
+.DS_Store
+._*
+
+# Editor configuration file
+.fleet/
+.idea/
