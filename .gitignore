@@ -5,3 +5,11 @@
 # Editor configuration file
 .fleet/
 .idea/
+idea.config.js
+
+# Node.js dependencies
+node_modules/
+
+# Build output
+.svelte-kit/
+build/
