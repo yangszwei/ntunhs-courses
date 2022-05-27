@@ -1,15 +1,19 @@
 {
-  "name": "ntunhs-courses",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "svelte-kit dev",
-    "dev:host": "svelte-kit dev --host",
-    "build": "svelte-kit build",
-    "preview": "svelte-kit preview"
-  },
-  "devDependencies": {
-    "@sveltejs/adapter-node": "^1.0.0-next.76",
-    "@sveltejs/kit": "^1.0.0-next.345"
-  }
+	"name": "ntunhs-courses",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "svelte-kit dev",
+		"dev:host": "svelte-kit dev --host",
+		"build": "svelte-kit build",
+		"preview": "svelte-kit preview",
+		"lint": "prettier --check --ignore-path .gitignore --plugin-search-dir=. .",
+		"format": "prettier --write --ignore-path .gitignore --plugin-search-dir=. ."
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-node": "^1.0.0-next.76",
+		"@sveltejs/kit": "^1.0.0-next.345",
+		"prettier": "^2.6.2",
+		"prettier-plugin-svelte": "^2.7.0"
+	}
 }
