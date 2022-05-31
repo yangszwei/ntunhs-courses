@@ -3,7 +3,7 @@ class Course {
 	/**
 	 * @param props
 	 * @param {string} props.name - Name of the course subject.
-	 * @param {string} props.lecturers - Lecturers of the course, first one is the main.
+	 * @param {string[]} props.lecturers - Lecturers of the course, first one is the main.
 	 * @param {string[]} props.highlights - Highlights of the course.
 	 * @param {string} props.level - Degree of difficulty of the course.
 	 * @param {string} props.abstract - A brief description on the course.
