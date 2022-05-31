@@ -1,5 +1,7 @@
 <script>
 	import '../app.css';
+	import AppBar from '$components/AppBar.svelte';
+	import { APP_NAME } from '$lib/js/app.js';
 </script>
 
 <svelte:head>
@@ -11,5 +13,7 @@
 		rel="stylesheet"
 	/>
 </svelte:head>
+
+<AppBar title={APP_NAME} />
 
 <slot />
