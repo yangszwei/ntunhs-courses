@@ -36,13 +36,65 @@ class Course {
 		/** Weeks the course takes place. */
 		this.weeks = props.weeks;
 		/** Weekly time (weekday & session) when the course takes place. */
-		this.time = props.time;
+		this.time = new Time(...props.time);
 		/** Classroom (location) where the course takes place. */
 		this.room = props.room;
 		/** Remark for the course offer. */
 		this.remark = props.remark;
 		/** Credits that can be earned from the course. */
 		this.credits = props.credits;
+	}
+
+	/** This returns main lecturer of the course. */
+	get lecturer() {
+		return this.lecturers[0];
+	}
+}
+
+/** Time records the weekday & sessions when a course takes place. */
+class Time extends Array {
+	/** Weekday names. */
+	static get WEEKDAY() {
+		return ['日', '一', '二', '三', '四', '五', '六'];
+	}
+
+	/** This prints the session name in human-readable format. */
+	static toSessionName(hex) {
+		const numbers = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+		const num = parseInt(hex, 16);
+		return num > 10 ? '十' + numbers[num % 10] : numbers[num];
+	}
+
+	/** This prints the course time in human-readable format. */
+	prettyPrint() {
+		const result = [];
+		const subset = {};
+		for (const [day, session] of this.map((s) => [parseInt(s[0]), parseInt(s[1], 16)])) {
+			subset[day] = subset[day] || [];
+			subset[day].push(session);
+		}
+		for (const day in subset) {
+			const res = [];
+			let start = 0;
+			for (let end = 1; end <= subset[day].length; end++) {
+				if (subset[day][end] !== subset[day][end - 1] + 1 || end === subset[day].length) {
+					const slice = subset[day].slice(start, end);
+					res.push(
+						slice.length === 1
+							? Time.toSessionName(slice[0])
+							: [slice[0], slice[slice.length - 1]]
+									.map(Time.toSessionName)
+									.join(slice.length > 2 ? '～' : '、')
+					);
+					start = end;
+				}
+			}
+			result.push(
+				`週${Time.WEEKDAY[day]}&nbsp;&nbsp;` +
+					`${subset.length === 1 ? '第' : ''}${res.join('、')}節`
+			);
+		}
+		return result.join('、');
 	}
 }
 
