@@ -7,3 +7,21 @@
 		@apply bg-gray-100 font-sans;
 	}
 }
+
+@layer components {
+	.badge {
+		@apply mr-2 rounded-xl px-2 py-1 text-xs;
+	}
+}
+
+@layer utilities {
+	.separator-dot > *:not(:last-child):after {
+		@apply m-0.5;
+		content: '‧';
+	}
+
+	.separator-slash > *:not(:last-child):after {
+		@apply m-0.5;
+		content: ' / ';
+	}
+}

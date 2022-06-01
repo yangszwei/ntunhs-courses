@@ -1,3 +1,15 @@
+/** Course highlight. */
+const HIGHLIGHT = {
+	popular: { name: '熱門課程', style: 'bg-red-500 text-white' },
+};
+
+/** Course level. */
+const LEVEL = {
+	introductory: { name: '入門課程', style: 'bg-blue-500 text-white' },
+	fundamental: { name: '基礎課程', style: 'bg-green-500 text-white' },
+	advanced: { name: '進階課程', style: 'bg-yellow-500 text-white' },
+};
+
 /** A course with a particular subject held at the school. */
 class Course {
 	/**
@@ -98,4 +110,4 @@ class Time extends Array {
 	}
 }
 
-export { Course };
+export { HIGHLIGHT, LEVEL, Course };
