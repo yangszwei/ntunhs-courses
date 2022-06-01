@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+	html {
+		@apply h-full w-full;
+	}
+
 	body {
-		@apply bg-gray-100 font-sans;
+		@apply h-full bg-gray-100 font-sans;
 	}
 }
 
