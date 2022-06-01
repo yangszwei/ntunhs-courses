@@ -1,4 +1,8 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
 	/** @type {HTMLElement} */
 	let card, overlay;
 
@@ -35,6 +39,7 @@
 		const placeholder = card.cloneNode(true);
 		placeholder.classList.add('invisible');
 		expanded = 1;
+		dispatch('expand');
 		setTimeout(() => {
 			card.after(placeholder);
 			pos.target.parentElement.scrollTo(pos.scrollLeft, pos.scrollTop);
@@ -50,6 +55,7 @@
 	export function shrink() {
 		if (expanded === 0) return;
 		expanded = 1;
+		dispatch('shrink');
 		const placeholder = card.nextElementSibling;
 		const pos = getPosition(placeholder);
 		card.style.inset = `${pos.top}px ${pos.right}px ${pos.bottom}px ${pos.left}px`;
@@ -88,9 +94,10 @@
 <div
 	bind:this={card}
 	class:absolute={expanded !== 0}
+	class:overflow-auto={expanded !== 0}
 	class:shadow-xl={expanded === 0}
 	class:z-20={expanded !== 0}
-	class="rounded-xl bg-white  shadow-gray-200 transition-all duration-200"
+	class="rounded-xl bg-white shadow-xl shadow-gray-200 transition-all duration-200"
 >
 	<slot />
 </div>
