@@ -10,6 +10,27 @@ const LEVEL = {
 	advanced: { name: '進階課程', style: 'bg-yellow-500 text-white' },
 };
 
+/** Weekday names. **/
+const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
+
+/** Session start/end times. **/
+const SESSIONS = [
+	['08:10', '09:00'],
+	['09:10', '10:00'],
+	['10:10', '11:00'],
+	['11:10', '12:00'],
+	['12:40', '13:30'],
+	['13:40', '14:30'],
+	['14:40', '15:30'],
+	['15:40', '16:30'],
+	['16:40', '17:30'],
+	['17:40', '18:30'],
+	['18:35', '19:25'],
+	['19:30', '20:20'],
+	['20:25', '21:15'],
+	['21:20', '22:10'],
+];
+
 /** A course with a particular subject held at the school. */
 class Course {
 	/**
@@ -65,16 +86,36 @@ class Course {
 
 /** Time records the weekday & sessions when a course takes place. */
 class Time extends Array {
-	/** Weekday names. */
-	static get WEEKDAY() {
-		return ['日', '一', '二', '三', '四', '五', '六'];
-	}
-
 	/** This prints the session name in human-readable format. */
 	static toSessionName(hex) {
 		const numbers = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
 		const num = parseInt(hex, 16);
 		return num > 10 ? '十' + numbers[num % 10] : numbers[num];
+	}
+
+	/**
+	 * This splits the course time into consecutive subsequences.
+	 * @returns {{day: string, start: number, end: number}[]}
+	 * */
+	group() {
+		const sess = new Array(7).fill(null).map(() => []);
+		for (const [day, session] of this.map((s) => [s[0], parseInt(s[1], 16)]))
+			sess[day].push(session);
+		const result = [];
+		for (const day in sess) {
+			if (sess[day].length === 0) continue;
+			let start = 0;
+			for (let end = 1; end <= sess[day].length; end++)
+				if (sess[day][end] !== sess[day][end - 1] + 1 || sess.length === end) {
+					result.push({
+						day,
+						start: sess[day][start],
+						end: sess[day][sess.length === end ? end : end - 1],
+					});
+					start = end;
+				}
+		}
+		return result;
 	}
 
 	/** This prints the course time in human-readable format. */
@@ -102,12 +143,11 @@ class Time extends Array {
 				}
 			}
 			result.push(
-				`週${Time.WEEKDAY[day]}&nbsp;&nbsp;` +
-					`${subset.length === 1 ? '第' : ''}${res.join('、')}節`
+				`週${WEEKDAYS[day]}&nbsp;&nbsp;` + `${subset.length === 1 ? '第' : ''}${res.join('、')}節`
 			);
 		}
 		return result.join('、');
 	}
 }
 
-export { HIGHLIGHT, LEVEL, Course };
+export { HIGHLIGHT, LEVEL, WEEKDAYS, SESSIONS, Course };

@@ -16,6 +16,10 @@
 	.badge {
 		@apply mr-2 rounded-xl px-2 py-1 text-xs;
 	}
+
+	.card {
+		@apply rounded-lg bg-white;
+	}
 }
 
 @layer utilities {
