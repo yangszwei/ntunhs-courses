@@ -7,6 +7,11 @@ const config = {
 		alias: {
 			$components: 'src/components',
 		},
+		vite: {
+			server: {
+				hmr: { clientPort: 443 },
+			},
+		},
 	},
 };
 
