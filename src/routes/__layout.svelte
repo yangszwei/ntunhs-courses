@@ -1,10 +1,10 @@
 <script>
 	import '../app.css';
 	import Icon from '@iconify/svelte';
-	import AppBar from '$components/AppBar.svelte';
-	import CourseCard from '$components/CourseCard.svelte';
-	import Filter from '$components/Filter.svelte';
-	import TimeTable from '$components/TimeTable.svelte';
+	import AppBar from '$lib/components/AppBar.svelte';
+	import CourseCard from '$lib/components/CourseCard.svelte';
+	import Filter from '$lib/components/Filter.svelte';
+	import TimeTable from '$lib/components/TimeTable.svelte';
 	import { APP_NAME } from '$lib/js/app.js';
 
 	/** This is the course data. */
