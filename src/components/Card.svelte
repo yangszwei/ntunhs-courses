@@ -1,103 +1,129 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 
+	/**
+	 * This method returns the number within the limit closest to the value.
+	 * @param {number} value
+	 * @param {number} min
+	 * @param {number} max
+	 * @returns {number}
+	 * */
+	Math.limit = (value, min, max) => Math.max(min, Math.min(max, value));
+
+	/** This gets the *absolute* position of an element. */
+	function getAbsPosition(e) {
+		const { scrollTop, scrollLeft } = e.parentElement;
+		const { offsetHeight, offsetWidth } = e.offsetParent;
+		return {
+			top: e.offsetTop - scrollTop,
+			left: e.offsetLeft - scrollLeft,
+			bottom: offsetHeight - (e.offsetTop - scrollTop) - e.offsetHeight,
+			right: offsetWidth - (e.offsetLeft - scrollLeft) - e.offsetWidth,
+			parent: { scrollTop, scrollLeft, offsetHeight, offsetWidth },
+		};
+	}
+
+	/** This method calculates the position for expanded element to expand to. */
+	function calcExpandedPosition(e, viewport) {
+		const { offsetHeight, offsetWidth } = viewport;
+		const height = Math.limit(e.scrollHeight, offsetHeight * 0.6, offsetHeight * 0.8);
+		const width = Math.limit(e.scrollWidth, offsetWidth * 0.8, Math.max(600, offsetWidth * 0.9));
+		const middleX = viewport.offsetWidth / 2;
+		const middleY = viewport.offsetHeight / 2;
+		return {
+			top: middleY - height / 2 - 2,
+			left: middleX - width / 2,
+			bottom: middleY - height / 2 - 2,
+			right: middleX - width / 2,
+		};
+	}
+
+	/** This is used to dispatch expand/shrink events. */
 	const dispatch = createEventDispatcher();
+
+	/** This method expands the Card element. */
+	export function expand() {
+		if (expanded || transiting || !expandable) return false;
+		/** This is the initial position of the card. */
+		const from = getAbsPosition(card);
+		card.style.inset = `${from.top}px ${from.right}px ${from.bottom}px ${from.left}px`;
+		/** This prevents effecting sibling elements when the card expands. */
+		const placeholder = card.cloneNode(true);
+		placeholder.classList.add('invisible');
+		card.after(placeholder);
+		/** The transition starts here. */
+		dispatch('expand');
+		transiting = 1;
+		setTimeout(() => {
+			const to = calcExpandedPosition(card, from.parent);
+			card.style.inset = `${to.top}px ${to.right}px ${to.bottom}px ${to.left}px`;
+			overlay?.classList.replace('opacity-0', 'opacity-100');
+		});
+		/** This cleans up the transition. */
+		setTimeout(() => {
+			expanded = true;
+			transiting = 0;
+		}, 210);
+	}
+
+	/** This method shrinks the expanded Card element. */
+	export function shrink() {
+		if (!expanded || transiting || !expandable) return false;
+		const placeholder = card.nextElementSibling;
+		const to = getAbsPosition(placeholder);
+		card.style.inset = `${to.top}px ${to.right}px ${to.bottom}px ${to.left}px`;
+		overlay?.classList.replace('opacity-100', 'opacity-0');
+		dispatch('shrink');
+		expanded = false;
+		transiting = -1;
+		/** This cleans up the transition. */
+		setTimeout(() => {
+			card.style.inset = '';
+			card.parentElement.removeChild(placeholder);
+			transiting = 0;
+		}, 200);
+	}
 
 	/** @type {HTMLElement} */
 	let card, overlay;
 
-	/** The expanded state of the card. */
-	export let expanded = 0;
+	/** The controls whether the card is expandable. */
+	export let expandable = false;
 
-	/**
-	 * This gets the offset position of the element.
-	 * @param {HTMLElement} e - The target element.
-	 * */
-	function getPosition(e) {
-		return {
-			target: e,
-			scrollTop: e.parentElement.scrollTop,
-			scrollLeft: e.parentElement.scrollLeft,
-			top: e.offsetTop - e.parentElement.scrollTop,
-			left: e.offsetLeft - e.parentElement.scrollLeft,
-			bottom:
-				e.offsetParent.offsetHeight - e.offsetTop - e.offsetHeight + e.parentElement.scrollTop,
-			right: e.offsetParent.offsetWidth - e.offsetLeft - e.offsetWidth + e.parentElement.scrollLeft,
-			height: e.offsetHeight,
-			width: e.offsetWidth,
-		};
-	}
+	/** This is an indicator of the current transition state. */
+	export let transiting = 0;
 
-	/** Transition duration. */
-	const DURATION = 200;
+	/** The controls whether the card is expanded. */
+	export let expanded = false;
 
-	/** This expands the Card element. */
-	export function expand() {
-		if (expanded === 2) return;
-		const pos = getPosition(card);
-		card.style.inset = `${pos.top}px ${pos.right}px ${pos.bottom}px ${pos.left}px`;
-		const placeholder = card.cloneNode(true);
-		placeholder.classList.add('invisible');
-		expanded = 1;
-		dispatch('expand');
-		setTimeout(() => {
-			card.after(placeholder);
-			pos.target.parentElement.scrollTo(pos.scrollLeft, pos.scrollTop);
-			card.style.inset = typeof expandTo === 'function' ? expandTo(pos) : expandTo;
-			overlay.classList.replace('opacity-0', 'opacity-100');
-		});
-		setTimeout(() => {
-			expanded = 2;
-		}, DURATION);
-	}
-
-	/** This shrinks the Card element. */
-	export function shrink() {
-		if (expanded === 0) return;
-		expanded = 1;
-		dispatch('shrink');
-		const placeholder = card.nextElementSibling;
-		const pos = getPosition(placeholder);
-		card.style.inset = `${pos.top}px ${pos.right}px ${pos.bottom}px ${pos.left}px`;
-		overlay.classList.replace('opacity-100', 'opacity-0');
-		setTimeout(() => {
-			card.parentElement.removeChild(placeholder);
-			expanded = 0;
-		}, DURATION);
-	}
-
-	/** This returns the position that the card should be expanded to. */
-	export let expandTo = function (pos) {
-		const insetX = (pos.target.offsetParent.offsetWidth - 768) / 2;
-		const insetY = Math.min(window.innerHeight * 0.9, 500) / 2;
-		const middleY = window.innerHeight / 2;
-		return `
-			${
-				Math.min(middleY - Math.min(250, middleY - window.innerHeight * 0.1), insetY) -
-				pos.target.parentElement.getBoundingClientRect().top
-			}px
-			${Math.max(pos.right, insetX)}px
-			${Math.min(middleY - Math.min(250, middleY - window.innerHeight * 0.1), insetY)}px
-			${Math.max(pos.left, insetX)}px
-		`;
-	};
+	/** The class names to add to the Card. */
+	let className = '';
+	export { className as class };
 </script>
 
-{#if expanded !== 0}
+<div bind:this={card} class:expandable class:transiting class:expanded class="card {className}">
+	<slot />
+</div>
+
+{#if transiting || expanded}
 	<div
 		bind:this={overlay}
-		class="fixed inset-0 z-10 overflow-hidden bg-gray-500 bg-opacity-75 opacity-0 transition-all duration-200 xl:absolute"
+		class="overlay fixed inset-0 z-10 overflow-hidden bg-gray-500/75 opacity-0 xl:absolute"
 		on:click={shrink}
 	/>
 {/if}
 
-<div
-	bind:this={card}
-	class:absolute={expanded !== 0}
-	class:overflow-auto={expanded !== 0}
-	class:shadow-xl={expanded === 0}
-	class:z-20={expanded !== 0}
-	class="rounded-xl bg-white shadow-xl shadow-gray-200 transition-all duration-200"
->
-	<slot />
-</div>
+<style>
+	.expandable,
+	.overlay {
+		transition: inset 0.2s;
+	}
+
+	.transiting {
+		@apply absolute z-20 overflow-hidden shadow-none;
+	}
+
+	.expanded {
+		@apply absolute z-20 overflow-auto shadow-none;
+	}
+</style>
