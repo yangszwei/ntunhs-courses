@@ -5,7 +5,7 @@
 	import CourseCard from '$lib/components/CourseCard.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import TimeTable from '$lib/components/TimeTable.svelte';
-	import { APP_NAME } from '$lib/js/app.js';
+	import { APP_NAME } from '$lib/values/app.js';
 
 	/** This is the course data. */
 	const courses = [];

@@ -1,5 +1,5 @@
 <script>
-	import { APP_NAME } from '$lib/js/app.js';
+	import { APP_NAME } from '$lib/values/app.js';
 </script>
 
 <svelte:head>
