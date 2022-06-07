@@ -1,43 +1,58 @@
-<script>
-	import { LEVEL, WEEKDAYS, SESSIONS } from '$lib/js/course.js';
+<script context="module">
+	import { WEEKDAYS } from '$lib/values/common.js';
+	import { LEVELS, SESSIONS } from '$lib/values/course.js';
+
+	/** This is the number of sessions per day. */
+	const sessNum = Object.keys(SESSIONS).length;
 
 	/**
-	 * This build the tabular presentation of the course data.
+	 * This builds a tabular presentation of the course data.
 	 * @param courses {Course[]} - The course data.
-	 * @returns {{ start: number, end?: number, course?: Course, level?: object }[][]}
-	 * */
+	 * @returns {{ start: number, end?: number, course?: Course, level?: Object, rowspan?: number }[][]}
+	 */
 	function build(courses) {
-		let result = new Array(SESSIONS.length + 1)
-			.fill(null)
-			.map(() => new Array(WEEKDAYS.length).fill(null));
-		result[0] = WEEKDAYS;
+		/** This is the tabular presentation of the data. */
+		let table = new Array(sessNum + 1).fill(null).map(() => new Array(WEEKDAYS.length));
+		/** This sets the table headers. */
+		table[0] = WEEKDAYS;
+		/** This sets the table headers. */
 		for (const course of courses) {
-			for (const { day, start, end } of course.time.group()) {
-				result[start][day] = {
-					course,
+			for (const { day, start, end } of course.time.sort()) {
+				const s = parseInt(start, 16),
+					e = parseInt(end, 16);
+				table[s][day] = {
 					start,
 					end,
-					level: LEVEL[course.level],
+					course,
+					level: LEVELS[course.level],
+					rowspan: e - s + 1,
 				};
-				for (let i = start + 1; i <= end; i++) result[i][day] = { start: -1 };
+				for (let i = s + 1; i <= e; i++) table[i][day] = { start: -1 };
 			}
 		}
-		if (result.slice(1).every((x) => !x[0] && !x[6])) result = result.map((x) => x.slice(1, -1));
-		if (result.slice(11, 15).every((x) => x.every((y) => !y))) result.splice(11, 15);
-		return result;
+		/** This trims the empty sections from the table. */
+		if (table.slice(1).every((x) => !x[0] && !x[6])) table = table.map((x) => x.slice(1, -1));
+		if (table.slice(11, 15).every((x) => x.every((y) => !y))) table.splice(11, 15);
+		return table;
 	}
+</script>
 
-	/** Tabular presentation of the course data. */
+<script>
+	/** This is the tabular presentation of the course data. */
 	let data;
 
-	/** @type {Course[]} */
+	/**
+	 * The course data.
+	 * @type {Course[]}
+	 * */
 	export let courses = [];
 
+	/** This rebuilds the data on courses change. */
 	$: data = build(courses);
 </script>
 
-<div class="card h-full overflow-auto bg-white">
-	<div class="h-full p-1 pt-0 ">
+<div class="card h-full overflow-auto">
+	<div class="h-full p-1 pt-0">
 		{#if data}
 			<table class="h-full w-full text-center text-xs">
 				<tr class="h-6">
@@ -51,12 +66,12 @@
 						<td class="font-medium text-gray-500">{session + 1}</td>
 						{#each weekdays as item}
 							{#if item && item.start > 0}
-								<td class="p-1 px-0.5" rowspan={item.end - item.start + 1}>
+								<td class="p-1 px-0.5" rowspan={item.rowspan}>
 									<div class="card h-full p-1.5 text-left {item.level.style}">
 										<p class="mb-1 font-medium">{item.course.name}</p>
 										<p>
-											<span class="whitespace-nowrap">{SESSIONS[item.start - 1][0]}</span> ~
-											<span class="whitespace-nowrap">{SESSIONS[item.end - 1][1]}</span>
+											<span class="whitespace-nowrap">{SESSIONS[item.start].time[0]}</span> ~
+											<span class="whitespace-nowrap">{SESSIONS[item.end].time[1]}</span>
 										</p>
 									</div>
 								</td>
