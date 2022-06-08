@@ -81,3 +81,19 @@ export const SESSIONS = Object.freeze({
 		time: ['21:20', '22:10'],
 	},
 });
+
+/** Course type name. */
+export const TYPES = {
+	1: {
+		name: '通識必修(通識)',
+	},
+	3: {
+		name: '專業必修(系所)',
+	},
+	5: {
+		name: '通識選修(通識)',
+	},
+	7: {
+		name: '專業選修(系所)',
+	},
+};

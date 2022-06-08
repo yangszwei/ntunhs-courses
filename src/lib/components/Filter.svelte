@@ -1,60 +1,75 @@
-<script>
-	import Icon from '@iconify/svelte';
-	import { SESSIONS, WEEKDAYS } from '$lib/js/course.js';
-
-	/** The contains the filter value. */
-	const filter = {
-		keywords: '',
-		weekdays: [],
-		sessions: [],
-	};
+<script context="module">
+	import { WEEKDAYS } from '$lib/values/common.js';
+	import { SESSIONS, TYPES } from '$lib/values/course.js';
 </script>
 
-<div class="card h-full">
-	<header class="mx-2 flex h-14">
+<script>
+	/** This is the filter values. */
+	export const value = Object.seal({
+		search: '',
+		types: [],
+		weekdays: [],
+		sessions: [],
+	});
+</script>
+
+<div class="card h-full overflow-auto">
+	<header class="flex h-14 shrink-0 items-center border-b">
 		<input
 			type="text"
-			bind:value={filter.keywords}
-			placeholder="以課程主題或班級名稱搜尋"
-			class="m-2 grow border-b text-lg leading-10 outline-0"
+			class="w-full p-2 outline-0"
+			bind:value={value.search}
+			placeholder="以課程名稱、主題或班級名稱搜尋"
 		/>
-		<button class="p-2">
-			<Icon icon="mdi:search" class="text-xl" />
-		</button>
 	</header>
-	<main class="mx-2">
-		<div class="card border">
-			<h1 class="p-2 pb-0 text-sm font-medium">上課時間</h1>
-			<div class="flex gap-2 overflow-auto p-2 md:flex-wrap">
-				{#each WEEKDAYS as name, value}
+	<main class="grow overflow-auto">
+		<div class="p-2">
+			<h1 class="mb-3 text-xs font-medium">課程類別</h1>
+			<div class="flex flex-wrap justify-center gap-2">
+				{#each Object.keys(TYPES) as type}
 					<label
-						class:checked={filter.weekdays.includes(value)}
-						class="badge mr-0 whitespace-nowrap border text-base"
+						class:selected={value.types.includes(type)}
+						class="badge grow border-2 p-2 text-center text-sm text-gray-500"
 					>
-						<span>週{name}</span>
-						<input type="checkbox" bind:group={filter.weekdays} {value} class="hidden" />
-					</label>
-				{/each}
-			</div>
-			<div class="flex max-h-48 flex-col gap-2 overflow-auto p-2">
-				{#each SESSIONS as [start, end], value}
-					<label
-						class:checked={filter.sessions.includes(value)}
-						class="badge mr-0 flex items-center border text-base"
-					>
-						<span class="mx-1 whitespace-nowrap">第{value + 1}節</span>
-						<span class="ml-auto mr-1 text-xs">{start} ~ {end}</span>
-						<input type="checkbox" bind:group={filter.sessions} {value} class="hidden" />
+						<input type="checkbox" class="hidden" bind:group={value.types} value={type} />
+						{TYPES[type].name}
 					</label>
 				{/each}
 			</div>
 		</div>
-		<!-- TODO: add more options -->
+		<div class="p-2">
+			<h1 class="mb-3 text-xs font-medium">上課時間</h1>
+			<div class="mb-3 flex gap-2 overflow-auto">
+				{#each WEEKDAYS as name, day}
+					<label
+						class:selected={value.weekdays.includes(day)}
+						class="badge grow border-2 p-2 text-center text-sm text-gray-500"
+					>
+						<input type="checkbox" class="hidden" bind:group={value.weekdays} value={day} />
+						{name}
+					</label>
+				{/each}
+			</div>
+			<div
+				class="card flex max-h-64 flex-wrap justify-center gap-2 overflow-auto border p-2 shadow-none"
+			>
+				{#each Object.keys(SESSIONS) as s}
+					<label
+						class:selected={value.sessions.includes(s)}
+						class="badge grow border-2 p-2 text-center text-sm text-gray-500"
+					>
+						<input type="checkbox" class="hidden" bind:group={value.sessions} value={s} />
+						<span>第{SESSIONS[s].name}節</span>
+						(<span>{SESSIONS[s].time[0]}</span> ~ <span>{SESSIONS[s].time[1]}</span>)
+					</label>
+				{/each}
+			</div>
+		</div>
 	</main>
 </div>
 
 <style>
-	.checked {
-		@apply bg-gray-500 text-white;
+	.selected {
+		@apply border-indigo-500 text-black;
 	}
 </style>
