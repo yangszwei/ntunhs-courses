@@ -1,5 +1,5 @@
 <script context="module">
-	import { HIGHLIGHTS, LEVELS } from '$lib/values/course.js';
+	import { HIGHLIGHTS, LEVELS, TYPES } from '$lib/values/course.js';
 
 	/**
 	 * This returns a list of tags for the course.
@@ -8,9 +8,12 @@
 	 */
 	function getTagList(course) {
 		const tags = [];
-		course.highlights?.forEach((hl) => tags.push(HIGHLIGHTS[hl]));
-		if (course.level) tags.push(LEVELS[course.level]);
-		if (course.type) tags.push({ name: course.type, style: 'bg-gray-300' });
+		course.highlights?.forEach((hl) => hl && tags.push(HIGHLIGHTS[hl]));
+		if (course.level) {
+			const { name, style } = LEVELS[course.level];
+			tags.push({ name: name + '課程', style });
+		}
+		if (course.type) tags.push({ name: TYPES[course.type].name, style: 'bg-gray-300' });
 		return tags;
 	}
 </script>
@@ -85,12 +88,14 @@
 	{#if expanded || transitioning}
 		<main class="p-2 transition-[padding_0.2s]" class:p-3={expanded || transitioning === 1}>
 			<div class="pb-2">
-				{#if course.lecturers > 1}
-					<p class="m-1">授課教師</p>
-					{#each course.lecturers.slice(0, -1) as lecturer}
-						<span class="whitespace-nowrap">{lecturer}、</span>
-					{/each}
-					<span class="whitespace-nowrap">{course.lecturers[course.lecturers.length]}</span>
+				{#if course.lecturers.length > 1}
+					<p class="m-1">
+						授課教師：
+						{#each course.lecturers.slice(0, -1) as lecturer}
+							<span class="whitespace-nowrap">{lecturer}、</span>
+						{/each}
+						<span class="whitespace-nowrap">{course.lecturers[course.lecturers.length - 1]}</span>
+					</p>
 				{/if}
 				{#if course.class}
 					<p class="m-1">上課班組：{course.class}</p>
