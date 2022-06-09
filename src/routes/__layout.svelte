@@ -1,3 +1,23 @@
+<script context="module">
+	import { Course } from '$lib/js/course.js';
+
+	export async function load({ fetch }) {
+		const res = await fetch('/courses');
+
+		if (res.ok) {
+			const data = await res.json();
+
+			return {
+				props: {
+					courses: data.map((value) => new Course(value)),
+				},
+			};
+		}
+
+		return { error: new Error((await res.json()).message) };
+	}
+</script>
+
 <script>
 	import '../app.css';
 	import Icon from '@iconify/svelte';
@@ -8,7 +28,7 @@
 	import { APP_NAME } from '$lib/values/app.js';
 
 	/** This is the course data. */
-	const courses = [];
+	export let courses = [];
 
 	/** This contains the selected courses. */
 	let selected = [];
