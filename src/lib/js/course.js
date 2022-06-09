@@ -23,13 +23,13 @@ class Course {
 	 * @param {Object} props - The course data.
 	 * @param {string} props.id - The course id.
 	 * @param {string} props.semester - Semester in which the course takes place.
-	 * @param {string[]} props.highlights - Highlights of the course.
+	 * @param {string} props.highlights - A comma-separated list of highlights of the course.
 	 * @param {number} props.level - Degree of difficulty of the course.
-	 * @param {string[]} props.lecturers - The lecturers of the course, first one is the main.
+	 * @param {string} props.lecturers - A comma-separated list of lecturers of the course, first one is the main.
 	 * @param {Object} props.subject - The subject of the course.
 	 * @param {string} props.abstract - A brief description on the course.
 	 * @param {string} props.weeks - The weeks that when the course takes place.
-	 * @param {string[]} props.time - The weekly time when the course takes place.
+	 * @param {string} props.time - A comma-separated list of weekly time when the course takes place.
 	 * @param {string} props.room - Classroom (location) where the course takes place.
 	 * @param {string} props.remark - Remark for the course.
 	 * @param {number} props.credits - Credits that can be earned from the course.
@@ -40,11 +40,11 @@ class Course {
 		/** Semester in which the course takes place. */
 		this.semester = props.semester;
 		/** Highlights of the course. */
-		this.highlights = props.highlights;
+		this.highlights = props.highlights.split(',');
 		/** Degree of difficulty of the course. */
 		this.level = props.level;
 		/** The lecturers of the course, first one is the main. */
-		this.lecturers = props.lecturers;
+		this.lecturers = props.lecturers.split(',');
 		/** The subject of the course. */
 		this.subject = new Subject(props.subject);
 		/** A brief description on the course. */
@@ -52,7 +52,7 @@ class Course {
 		/** The weeks that when the course takes place. */
 		this.weeks = props.weeks;
 		/** The weekly time when the course takes place. */
-		this.time = new Sessions(...props.time);
+		this.time = new Sessions(...props.time.split(','));
 		/** Classroom (location) where the course takes place. */
 		this.room = props.room;
 		/** Remark for the course. */
