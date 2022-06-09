@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"prisma": {
-		"schema": "src/lib/data/schema.prisma"
+		"schema": "data/schema.prisma"
 	},
 	"scripts": {
 		"dev": "svelte-kit dev",
