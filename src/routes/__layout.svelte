@@ -24,18 +24,97 @@
 	import AppBar from '$lib/components/AppBar.svelte';
 	import CourseCard from '$lib/components/CourseCard.svelte';
 	import Filter from '$lib/components/Filter.svelte';
-	import TimeTable from '$lib/components/TimeTable.svelte';
+	import Summary from '$lib/components/Summary.svelte';
 	import { APP_NAME } from '$lib/values/app.js';
+	import { onMount } from 'svelte';
 
-	/** This is the course data. */
+	/** This controls the active tab in mobile view. */
+	let tab = '';
+
+	/** @type {HTMLElement} */
+	let filter, main, aside;
+
+	const animate = (function () {
+		let from, start, diff, max;
+		return {
+			init: () => (from = max = parseInt(getComputedStyle(aside).top, 10)),
+			search: () => {
+				filter.classList.remove('hidden');
+				if (tab !== 'search') {
+					main.style.opacity = `${0}`;
+					filter.style.bottom = `${window.innerHeight - max}px`;
+				}
+				main.classList.replace('transition-none', 'transition-[opacity_0.2s]');
+				aside.classList.replace('transition-none', 'transition-[all_0.2s]');
+				setTimeout(() => {
+					if (tab === 'search') {
+						tab = '';
+						aside.style.top = `${max}px`;
+						main.style.opacity = `${1}`;
+						main.classList.remove('hidden');
+						filter.classList.replace('opacity-100', 'opacity-0');
+						filter.classList.replace('bottom-0', 'bottom-full');
+					} else {
+						tab = 'search';
+						main.classList.add('hidden');
+						main.style.opacity = `${0}`;
+						filter.style.bottom = `0px`;
+						aside.style.top = `${window.innerHeight}px`;
+						filter.classList.replace('opacity-0', 'opacity-100');
+						filter.classList.replace('bottom-full', 'bottom-0');
+					}
+				});
+				setTimeout(() => {
+					main.classList.replace('transition-[opacity_0.2s]', 'transition-none');
+					aside.classList.replace('transition-[all_0.2s]', 'transition-none');
+				}, 1000);
+			},
+			start: (e) => (start = e.targetTouches[0].clientY),
+			move: (e) => {
+				diff = e.targetTouches[0].clientY - start;
+				main.style.opacity = `${Math.min(Math.max(from + diff * 1.2, 0) / max)}`;
+				aside.style.top = Math.min(Math.max(from + diff, 0), max) + 'px';
+			},
+			end: () => {
+				aside.classList.replace('transition-none', 'transition-[all_0.2s]');
+				setTimeout(() => {
+					const change = Math.abs(diff) > max * 0.15;
+					if ((change && diff >= 0) || (!change && diff < 0)) {
+						from = max;
+						tab = '';
+						main.classList.replace('z-30', 'z-20');
+						main.style.opacity = `${1}`;
+						aside.style.top = `${max}px`;
+					} else {
+						from = 0;
+						tab = 'summary';
+						main.classList.replace('z-20', 'z-30');
+						main.style.opacity = `${0}`;
+						aside.style.top = `0px`;
+					}
+				});
+				setTimeout(() => {
+					start = diff = 0;
+					aside.classList.replace('transition-[all_0.2s]', 'transition-none');
+				}, 200);
+			},
+		};
+	})();
+
+	onMount(animate.init);
+
+	let cards = [];
+
+	let selected;
+
+	let checkboxes = [];
+
+	$: selected = courses.filter((v, i) => checkboxes[i]);
+
 	export let courses = [];
-
-	/** This contains the selected courses. */
-	let selected = [];
-
-	/** The sets the active view. */
-	let active = 'filter';
 </script>
+
+<svelte:window on:resize={animate.init} />
 
 <svelte:head>
 	<!-- Google Fonts -->
@@ -47,71 +126,56 @@
 	/>
 </svelte:head>
 
-<AppBar title={APP_NAME} />
+<AppBar title={APP_NAME}>
+	<button
+		class="p-2"
+		class:text-gray-400={tab === 'summary'}
+		disabled={tab === 'summary'}
+		on:click={animate.search}
+	>
+		<Icon icon={tab === 'search' ? 'mdi:close' : 'mdi:search'} class="text-xl" />
+	</button>
+</AppBar>
 
-<div class="relative mx-2 h-full overflow-hidden xl:flex">
-	<div
-		class:!top-0={active === 'filter'}
-		class="absolute top-full z-20 h-full w-full pb-2 transition-all xl:static xl:w-2/12"
+<div class="relative m-2 mt-0 h-full overflow-hidden xl:flex">
+	<nav
+		bind:this={filter}
+		class:hidden={tab !== 'search'}
+		class="not absolute bottom-full z-20 h-full w-full p-2 pb-4 opacity-0 transition-[all_1s] xl:static xl:!block xl:w-2/12 xl:opacity-100"
 	>
-		<div class="h-full shadow-lg shadow-gray-200">
-			<Filter />
-		</div>
-	</div>
-	<div
-		class:opacity-0={active !== ''}
-		class="relative mx-2 h-full grow overflow-hidden rounded-lg transition-all xl:opacity-100"
+		<Filter />
+	</nav>
+	<main
+		bind:this={main}
+		class:z-30={cards.some((exp) => exp)}
+		class="relative h-full grow pb-10 transition-none xl:pb-4"
 	>
-		<div class="flex h-full flex-col gap-4 overflow-y-auto pb-4">
-			{#each courses as course}
-				<CourseCard {course} />
+		<div class="flex h-full flex-col gap-4 overflow-y-auto p-2 pb-4 xl:pb-0">
+			{#each courses as course, i (course.id)}
+				<input
+					bind:checked={checkboxes[i]}
+					bind:group={selected}
+					type="checkbox"
+					class="hidden"
+					value={course}
+				/>
+				<CourseCard bind:expanded={cards[i]} bind:selected={checkboxes[i]} {course} />
 			{/each}
 		</div>
-	</div>
-	<div
-		class:!top-0={active === 'timetable'}
-		class="absolute top-full z-20 h-full w-full pb-2 transition-all xl:static xl:w-4/12"
+	</main>
+	<aside
+		bind:this={aside}
+		class="absolute top-[calc(100%-3rem)] z-20 h-full w-full p-2 pb-4 pt-0 transition-none xl:static xl:w-4/12"
 	>
-		<div class="card flex h-full flex-col overflow-hidden p-1 shadow-xl shadow-gray-200">
-			<div class="grow"><TimeTable {selected} /></div>
-			<div class="card m-2 flex flex h-1/6 max-h-14 items-center justify-center border">
-				<p class="text-center text-sm font-medium">
-					已選學分：{selected.reduce((a, c) => a + c.credits, 0)}
-				</p>
-			</div>
+		<div class="h-full">
+			<Summary
+				courses={selected}
+				on:touchstart={animate.start}
+				on:touchmove={animate.move}
+				on:touchend={animate.end}
+			/>
 		</div>
-	</div>
-</div>
-
-<div class="fixed bottom-0 right-0 left-0 h-14 xl:hidden">
-	<div
-		class="flex h-full items-center justify-around gap-2 border-t bg-white px-2 shadow-xl shadow-gray-200"
-	>
-		{#if active === 'filter'}
-			<button class="p-2" on:click={() => (active = '')}>
-				<Icon icon="mdi:chevron-down" class="text-xl" />
-			</button>
-		{:else}
-			<button class="p-2" on:click={() => (active = 'filter')}>
-				<Icon icon="mdi:search" class="text-xl" />
-			</button>
-		{/if}
-		{#if active === 'timetable'}
-			<button class="p-2" on:click={() => (active = '')}>
-				<Icon icon="mdi:chevron-down" class="text-xl" />
-			</button>
-		{:else}
-			<button class="p-2" on:click={() => (active = 'timetable')}>
-				<Icon icon="mdi:timetable" class="text-xl" />
-			</button>
-		{/if}
-	</div>
+	</aside>
 </div>
 
 <slot />
-
-<style lang="postcss">
-	:global(body) {
-		@apply pb-14 xl:pb-0;
-	}
-</style>
