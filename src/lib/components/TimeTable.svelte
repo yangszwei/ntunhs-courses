@@ -47,11 +47,15 @@
 	 * */
 	export let courses = [];
 
+	/** The class names to add to the TimeTable component. */
+	let className = '';
+	export { className as class };
+
 	/** This rebuilds the data on courses change. */
 	$: data = build(courses);
 </script>
 
-<div class="card h-full overflow-auto">
+<div class="card h-full overflow-auto {className}">
 	<div class="h-full p-1 pt-0">
 		{#if data}
 			<table class="h-full w-full text-center text-xs">

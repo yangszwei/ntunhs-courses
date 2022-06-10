@@ -26,7 +26,7 @@
 	let card;
 
 	/** The indicators of the card expanded state. */
-	let expanded = false,
+	export let expanded = false,
 		transitioning = 0;
 
 	/** This is the selected state of the card. */

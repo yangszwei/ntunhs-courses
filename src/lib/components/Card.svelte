@@ -110,7 +110,7 @@
 {#if transitioning || expanded}
 	<div
 		bind:this={overlay}
-		class="overlay fixed inset-0 z-10 overflow-hidden bg-gray-500/75 opacity-0 transition-[opacity_0.2s] xl:absolute"
+		class="overlay fixed inset-0 overflow-hidden bg-gray-500/75 opacity-0 transition-[opacity_0.2s] xl:absolute"
 		on:click={shrink}
 	/>
 {/if}
