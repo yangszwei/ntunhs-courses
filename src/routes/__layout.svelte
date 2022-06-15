@@ -102,7 +102,6 @@
 	export let courses = [];
 
 	$: selected = courses.filter((v, i) => checkboxes[i]);
-	$: console.log(selected);
 </script>
 
 <svelte:head>

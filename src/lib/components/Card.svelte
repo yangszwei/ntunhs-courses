@@ -32,7 +32,6 @@
 	/** This method calculates the position to expand to. */
 	function calcExpandedPosition(e, viewport) {
 		const { offsetHeight, offsetWidth } = viewport;
-		console.log(e.scrollHeight, offsetHeight * 0.5, offsetHeight * 0.8);
 		const height = Math.limit(e.scrollHeight, offsetHeight * 0.5, offsetHeight * 0.8);
 		const width = Math.limit(
 			e.scrollWidth,
