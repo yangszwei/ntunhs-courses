@@ -42,6 +42,31 @@ class Course {
 		/** The course remark. */
 		this.remark = props.remark;
 	}
+
+	/** This returns the subject type. */
+	get type() {
+		return this.subject.type;
+	}
+
+	/** This returns the subject class. */
+	get class() {
+		return this.subject.class;
+	}
+
+	/** This returns the subject name. */
+	get name() {
+		return this.subject.name;
+	}
+
+	/** This returns the subject abstract. */
+	get abstract() {
+		return this.subject.abstract;
+	}
+
+	/** This returns the subject credits. */
+	get credits() {
+		return this.subject.credits;
+	}
 }
 
 export default Course;
