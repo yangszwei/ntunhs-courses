@@ -12,9 +12,9 @@ export const BUILDINGS = Object.freeze({
 
 /** Course levels name & style. */
 export const LEVELS = Object.freeze({
-	1: { name: '入門', style: 'bg-blue-500 text-white' },
-	2: { name: '基本', style: 'bg-green-500 text-white' },
-	3: { name: '進階', style: 'bg-yellow-500 text-white' },
+	1: { name: '入門課程', style: 'bg-blue-500 text-white' },
+	2: { name: '基本課程', style: 'bg-green-500 text-white' },
+	3: { name: '進階課程', style: 'bg-yellow-500 text-white' },
 });
 
 /** This is the indicator of a popular course. */
