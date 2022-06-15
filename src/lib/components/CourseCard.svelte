@@ -1,124 +1,163 @@
 <script context="module">
-	import { HIGHLIGHTS, LEVELS, TYPES } from '$lib/values/course.js';
+	import { LEVELS, POPULAR, TYPES } from '$lib/values/course.js';
 
-	/**
-	 * This returns a list of tags for the course.
-	 * @param course {Course} - The course data.
-	 * @returns {{ name: string, style: string }[]}
-	 */
-	function getTagList(course) {
+	function tags(course) {
 		const tags = [];
-		course.highlights?.forEach((hl) => hl && tags.push(HIGHLIGHTS[hl]));
-		if (course.level) {
-			const { name, style } = LEVELS[course.level];
-			tags.push({ name: name + '課程', style });
-		}
-		if (course.type) tags.push({ name: TYPES[course.type].name, style: 'bg-gray-300' });
+		if (course.isPopular) tags.push(POPULAR);
+		if (course.level) tags.push(LEVELS[course.level]);
+		if (course.type) tags.push(TYPES[course.type]);
 		return tags;
 	}
 </script>
 
 <script>
 	import Icon from '@iconify/svelte';
-	import Card from '$lib/components/Card.svelte';
+	import Card, { states } from '$lib/components/Card.svelte';
+	import Swipe from '$lib/components/Swipe.svelte';
 
-	/** @type {Card} */
 	let card;
-
-	/** The indicators of the card expanded state. */
-	export let expanded = false,
-		transitioning = 0;
-
-	/** This is the selected state of the card. */
-	export let selected = false;
 
 	/** @type {Course} */
 	export let course;
 
-	/** The class names to add to the Card. */
+	/** The expanded state of the card. */
+	export let expanded = states.SHRUNK;
+
+	/** The saved state of the card. */
+	export let saved = false;
+
+	/** The selected state of the card. */
+	export let selected = false;
+
+	/** The className to add to the component. */
 	let className = '';
 	export { className as class };
 </script>
 
-<Card bind:this={card} class={className} bind:expanded bind:transitioning expandable>
-	{#if course}
-		<header
-			class="p-2 pb-2 transition-[padding_0.2s]"
-			class:p-3={expanded || transitioning === 1}
-			on:click={() => card.expand()}
+<Card bind:this={card} bind:expanded class={className} expandable>
+	<header
+		class="card relative translate-x-0 overflow-hidden shadow-none xl:flex"
+		on:click={() => card.expand()}
+	>
+		<Swipe
+			class="z-10 bg-white p-2 xl:grow"
+			disabled={expanded}
+			on:swipe={() => (selected = !selected)}
 		>
-			<div class="flex flex-wrap justify-center">
-				<div class="grow">
-					<div class="m-1 flex flex-wrap gap-2 pb-1">
-						{#each getTagList(course) as tag}
-							<span class="badge mr-0 font-medium {tag.style}">{tag.name}</span>
-						{/each}
-					</div>
-					<h1 class="m-1 text-2xl font-medium">{course.name}</h1>
-					<div class="m-1 flex flex-wrap">
-						{#if course.lecturer}
-							<span class="sep-dot text-sm">{course.lecturer} 老師</span>
-						{/if}
-						{#if course.room}
-							<span class="sep-dot text-sm">{course.room}</span>
-						{/if}
-						{#if course.time}
-							<span class="sep-dot text-sm">{course.time.prettyPrint()}</span>
-						{/if}
-					</div>
+			<div class="m-1 flex">
+				<div class="flex grow flex-wrap gap-2">
+					{#each tags(course) as tag}
+						<p class="badge mr-0 font-medium {tag.style}">{tag.name}</p>
+					{/each}
 				</div>
-				<div class="flex items-center justify-center xl:w-1/6">
+				<div class="flex shrink-0 flex-wrap gap-2">
 					<button
-						class="flex items-center rounded-xl p-2 px-4 text-gray-700 hover:bg-gray-200/50"
-						class:text-red-500={selected}
-						on:click|stopPropagation={() => (selected = !selected)}
+						class="p-1 xl:hidden"
+						class:!block={expanded}
+						on:click|stopPropagation={() => (saved = !saved)}
 					>
-						{#if selected}
-							<span class="whitespace-nowrap">移除</span>
-							<Icon icon="mdi:close-circle-outline" class="ml-1.5 mt-0.5 text-xl" />
-						{:else}
-							<span class="whitespace-nowrap">選擇</span>
-							<Icon icon="mdi:plus-circle-outline" class="ml-1.5 mt-0.5 text-xl" />
-						{/if}
+						<Icon icon={saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'} />
 					</button>
+					{#if expanded}
+						<button class="p-1" on:click|stopPropagation={() => card.shrink()}>
+							<Icon icon="mdi:close" />
+						</button>
+					{:else}
+						<button
+							class="p-1 xl:hidden"
+							class:text-red-500={selected}
+							on:click|stopPropagation={() => (selected = !selected)}
+						>
+							<Icon icon={selected ? 'mdi:minus-circle-outline' : 'mdi:plus'} />
+						</button>
+					{/if}
 				</div>
 			</div>
-		</header>
-	{/if}
-	{#if expanded || transitioning}
-		<main class="p-2 transition-[padding_0.2s]" class:p-3={expanded || transitioning === 1}>
-			<div class="pb-2">
-				{#if course.lecturers.length > 1}
-					<p class="m-1">
-						授課教師：
-						{#each course.lecturers.slice(0, -1) as lecturer}
-							<span class="whitespace-nowrap">{lecturer}、</span>
-						{/each}
-						<span class="whitespace-nowrap">{course.lecturers[course.lecturers.length - 1]}</span>
-					</p>
+			<h1 class="m-1 my-2 text-2xl font-medium">{course.name}</h1>
+			<div class="center m-1">
+				{#if course.lecturer}
+					<p class="sep-dot text-sm">{course.lecturer} 老師</p>
 				{/if}
-				{#if course.class}
-					<p class="m-1">上課班組：{course.class}</p>
+				{#if course.sessions}
+					<p class="sep-dot text-sm">{course.sessions.prettyPrint()}</p>
 				{/if}
 			</div>
-			<p class="m-1">{course.abstract}</p>
-			<div class="card m-1 mt-4 bg-gray-200 p-2 text-sm shadow-none">
-				<h1 class="mb-0.5 text-xs font-medium text-gray-700">課表備註</h1>
-				<p class="text-sm">{course.remark}</p>
+		</Swipe>
+		<div class="absolute inset-0 -z-10 flex overflow-hidden xl:static">
+			<div class="ml-auto mr-0 xl:hidden">
+				<button
+					class="center h-full w-20 flex-col justify-evenly py-4 text-white"
+					class:bg-red-500={selected}
+					class:bg-green-500={!selected}
+				>
+					<Icon icon={selected ? 'mdi:minus-circle-outline' : 'mdi:plus'} class="text-xl" />
+					<span class="text-xs">{selected ? '移除課程' : '選擇課程'}</span>
+				</button>
+			</div>
+			<div class="xl:center hidden h-full justify-evenly gap-2 px-4" class:!hidden={expanded}>
+				<button
+					class="center card p-2 px-3 shadow-none hover:bg-gray-200"
+					on:click|stopPropagation={() => (saved = !saved)}
+				>
+					<Icon icon={saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'} class="mr-2 text-xl" />
+					{saved ? '已儲存' : '儲存課程'}
+				</button>
+				<button
+					class="center card p-2 px-3 shadow-none text-white"
+					class:bg-red-500={selected}
+					class:bg-green-500={!selected}
+					on:click|stopPropagation={() => (selected = !selected)}
+				>
+					<Icon icon={selected ? 'mdi:minus-circle-outline' : 'mdi:plus'} class="mr-2 text-xl" />
+					{selected ? '移除課程' : '選擇課程'}
+				</button>
+			</div>
+		</div>
+	</header>
+	{#if expanded !== states.SHRUNK}
+		<main class="px-2">
+			<ul class="mb-4 text-sm">
+				<li class="m-1">
+					<span class="font-medium">上課老師：</span>{course.lecturers.join('、')}
+				</li>
+				<li class="m-1"><span class="font-medium">上課班級：</span>{course.class}</li>
+				<li class="m-1">
+					<span class="font-medium">上課教室：</span>{course.room} ({course.room.describe()})
+				</li>
+			</ul>
+			<p class="m-1 mb-4 tracking-wide">{course.abstract}</p>
+			<div class="card m-1 mb-4 rounded-xl bg-gray-200 p-1 text-sm shadow-none">
+				<h1 class="m-1 text-xs font-medium">課表備註</h1>
+				<p class="m-1 text-sm">{course.remark}</p>
+			</div>
+			<div class="center m-1">
+				<div class="center grow">
+					{#if course.semester}
+						<span class="sep-slash text-sm">{course.semester.shortName}</span>
+					{/if}
+					{#if course.weeks}
+						<span class="sep-slash text-sm">{course.weeks}</span>
+					{/if}
+					{#if course.credits}
+						<span class="sep-slash text-sm">{course.credits} 學分</span>
+					{/if}
+				</div>
+				<button class="center p-1 text-sm">
+					<Icon icon="mdi:paperclip" class="mr-1" />
+					教學計畫
+				</button>
 			</div>
 		</main>
-		<footer class="p-2 transition-[padding_0.2s]" class:p-3={expanded || transitioning === 1}>
-			<div class="m-1 flex">
-				{#if course.semester}
-					<span class="sep-slash text-xs">{course.semester}</span>
-				{/if}
-				{#if course.weeks}
-					<span class="sep-slash text-xs">{course.weeks}</span>
-				{/if}
-				{#if course.credits}
-					<span class="sep-slash text-xs">{course.credits} 學分</span>
-				{/if}
-			</div>
+		<footer class="p-2">
+			<button
+				class="card center center block w-full justify-center p-2 text-white shadow-none"
+				class:bg-red-500={selected}
+				class:bg-green-500={!selected}
+				on:click={() => (selected = !selected)}
+			>
+				<Icon icon={selected ? 'mdi:minus-circle-outline' : 'mdi:plus'} class="mr-2" />
+				{selected ? '移除課程' : '選擇課程'}
+			</button>
 		</footer>
 	{/if}
 </Card>
