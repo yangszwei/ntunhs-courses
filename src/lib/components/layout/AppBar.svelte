@@ -6,7 +6,7 @@
 	export { className as class };
 </script>
 
-<header class="fixed inset-x-0 top-0 z-10 bg-gray-50">
+<header class="fixed inset-x-0 top-0 z-30 bg-gray-50">
 	<div class="center h-14">
 		<div class="mx-2 grow">
 			<a class="center gap-2 p-1 text-xl font-medium" href="/">
