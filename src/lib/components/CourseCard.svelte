@@ -103,7 +103,7 @@
 					{saved ? '已儲存' : '儲存課程'}
 				</button>
 				<button
-					class="center card p-2 px-3 shadow-none text-white"
+					class="center card p-2 px-3 text-white shadow-none"
 					class:bg-red-500={selected}
 					class:bg-green-500={!selected}
 					on:click|stopPropagation={() => (selected = !selected)}
