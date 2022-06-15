@@ -1,48 +1,40 @@
 <script context="module">
-	import { Course } from '$lib/js/course.js';
+	import Course from '$lib/models/course.js';
 
 	export async function load({ fetch }) {
 		const res = await fetch('/courses');
-
 		if (res.ok) {
 			const data = await res.json();
-
-			return {
-				props: {
-					courses: data.map((value) => new Course(value)),
-				},
-			};
+			const courses = data.map((props) => new Course(props));
+			return { props: { courses } };
 		}
-
-		return { error: new Error((await res.json()).message) };
 	}
 </script>
 
 <script>
 	import '../app.css';
 	import Icon from '@iconify/svelte';
-	import AppBar from '$lib/components/AppBar.svelte';
+	import AppBar from '$lib/components/layout/AppBar.svelte';
 	import CourseCard from '$lib/components/CourseCard.svelte';
-	import Filter from '$lib/components/Filter.svelte';
-	import Summary from '$lib/components/Summary.svelte';
-	import { APP_NAME } from '$lib/values/app.js';
+	import Summary from '$lib/components/layout/Summary.svelte';
+	import Search from '$lib/components/layout/Search.svelte';
 	import { onMount } from 'svelte';
 
 	/** This controls the active tab in mobile view. */
 	let tab = '';
 
 	/** @type {HTMLElement} */
-	let filter, main, aside;
+	let search, main, aside;
 
 	const animate = (function () {
 		let from, start, diff, max;
 		return {
 			init: () => (from = max = parseInt(getComputedStyle(aside).top, 10)),
 			search: () => {
-				filter.classList.remove('hidden');
+				search.classList.remove('hidden');
 				if (tab !== 'search') {
 					main.style.opacity = `${0}`;
-					filter.style.bottom = `${window.innerHeight - max}px`;
+					search.style.bottom = `${window.innerHeight - max}px`;
 				}
 				main.classList.replace('transition-none', 'transition-[opacity_0.2s]');
 				aside.classList.replace('transition-none', 'transition-[all_0.2s]');
@@ -52,16 +44,16 @@
 						aside.style.top = `${max}px`;
 						main.style.opacity = `${1}`;
 						main.classList.remove('hidden');
-						filter.classList.replace('opacity-100', 'opacity-0');
-						filter.classList.replace('bottom-0', 'bottom-full');
+						search.classList.replace('opacity-100', 'opacity-0');
+						search.classList.replace('bottom-0', 'bottom-full');
 					} else {
 						tab = 'search';
 						main.classList.add('hidden');
 						main.style.opacity = `${0}`;
-						filter.style.bottom = `0px`;
+						search.style.bottom = `0px`;
 						aside.style.top = `${window.innerHeight}px`;
-						filter.classList.replace('opacity-0', 'opacity-100');
-						filter.classList.replace('bottom-full', 'bottom-0');
+						search.classList.replace('opacity-0', 'opacity-100');
+						search.classList.replace('bottom-full', 'bottom-0');
 					}
 				});
 				setTimeout(() => {
@@ -105,16 +97,12 @@
 
 	let cards = [];
 
-	let selected;
-
 	let checkboxes = [];
 
-	$: selected = courses.filter((v, i) => checkboxes[i]);
-
 	export let courses = [];
-</script>
 
-<svelte:window on:resize={animate.init} />
+	$: selected = courses.filter((v, i) => checkboxes[i]);
+</script>
 
 <svelte:head>
 	<!-- Google Fonts -->
@@ -126,55 +114,50 @@
 	/>
 </svelte:head>
 
-<AppBar title={APP_NAME}>
+<AppBar>
 	<button
-		class="p-2"
+		class="p-2 xl:hidden"
 		class:text-gray-400={tab === 'summary'}
 		disabled={tab === 'summary'}
-		on:click={animate.search}
+		on:click={() => animate.search()}
 	>
 		<Icon icon={tab === 'search' ? 'mdi:close' : 'mdi:search'} class="text-xl" />
 	</button>
 </AppBar>
 
-<div class="relative m-2 mt-0 h-full overflow-hidden xl:flex">
-	<nav
-		bind:this={filter}
-		class:hidden={tab !== 'search'}
-		class="not absolute bottom-full z-20 h-full w-full p-2 pb-4 opacity-0 transition-[all_1s] xl:static xl:!block xl:w-2/12 xl:opacity-100"
+<div class="relative h-full overflow-hidden xl:flex">
+	<div
+		bind:this={search}
+		class="absolute bottom-full z-20 h-full w-full opacity-0 transition-[all_1s] xl:static xl:static xl:!block xl:w-1/5 xl:opacity-100"
 	>
-		<Filter />
-	</nav>
-	<main
-		bind:this={main}
-		class:z-30={cards.some((exp) => exp)}
-		class="relative h-full grow pb-10 transition-none xl:pb-4"
-	>
-		<div class="flex h-full flex-col gap-4 overflow-y-auto p-2 pb-4 xl:pb-0">
-			{#each courses as course, i (course.id)}
-				<input
-					bind:checked={checkboxes[i]}
-					bind:group={selected}
-					type="checkbox"
-					class="hidden"
-					value={course}
-				/>
-				<CourseCard bind:expanded={cards[i]} bind:selected={checkboxes[i]} {course} />
-			{/each}
+		<Search />
+	</div>
+	<main bind:this={main} class="h-full xl:grow xl:pb-4">
+		<div class="relative h-full overflow-hidden rounded-xl">
+			<div class="flex h-full flex-col gap-2 overflow-auto p-4 pb-14 pt-0">
+				{#each courses as course, i (course.id)}
+					<input
+						bind:checked={checkboxes[i]}
+						bind:group={selected}
+						type="checkbox"
+						class="hidden"
+						value={course}
+					/>
+					<CourseCard bind:expanded={cards[i]} bind:selected={checkboxes[i]} {course} />
+				{/each}
+			</div>
 		</div>
 	</main>
 	<aside
 		bind:this={aside}
-		class="absolute top-[calc(100%-3rem)] z-20 h-full w-full p-2 pb-4 pt-0 transition-none xl:static xl:w-4/12"
+		class="absolute top-[calc(100%-3rem)] z-20 h-full w-full transition-none xl:static xl:w-1/3"
 	>
-		<div class="h-full">
-			<Summary
-				courses={selected}
-				on:touchstart={animate.start}
-				on:touchmove={animate.move}
-				on:touchend={animate.end}
-			/>
-		</div>
+		<Summary
+			courses={selected}
+			on:touchstart={animate.start}
+			on:touchmove={animate.move}
+			on:touchend={animate.end}
+		/>
 	</aside>
 </div>
 

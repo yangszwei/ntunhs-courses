@@ -3,7 +3,7 @@
 	import { LEVELS, SESSIONS } from '$lib/values/course.js';
 
 	/** This is the number of sessions per day. */
-	const sessNum = Object.keys(SESSIONS).length;
+	const num = Object.keys(SESSIONS).length;
 
 	/**
 	 * This builds a tabular presentation of the course data.
@@ -12,12 +12,12 @@
 	 */
 	function build(courses) {
 		/** This is the tabular presentation of the data. */
-		let table = new Array(sessNum + 1).fill(null).map(() => new Array(WEEKDAYS.length));
+		let table = new Array(num + 1).fill(null).map(() => new Array(WEEKDAYS.length));
 		/** This sets the table headers. */
 		table[0] = WEEKDAYS;
 		/** This sets the table headers. */
 		for (const course of courses) {
-			for (const { day, start, end } of course.time.sort()) {
+			for (const { day, start, end } of course.sessions.group()) {
 				const s = parseInt(start, 16),
 					e = parseInt(end, 16);
 				table[s][day] = {

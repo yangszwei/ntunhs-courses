@@ -8,25 +8,26 @@ datasource db {
 }
 
 model Course {
-  id         Int     @id @default(autoincrement())
-  semester   String
-  highlights String
-  level      Int
-  lecturers  String
-  subject    Subject @relation(fields: [subjectId], references: [id])
-  subjectId  String
-  abstract   String
-  weeks      String
-  time       String
-  room       String
-  remark     String
-  credits    Int
+  id        Int     @id @default(autoincrement())
+  semester  String
+  isPopular Boolean @default(false)
+  level     Int?
+  lecturer  String?
+  lecturers String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  subjectId String
+  weeks     String
+  sessions  String
+  room      String?
+  remark    String
 }
 
 model Subject {
-  id      String   @id
-  type    Int
-  name    String
-  class   String
-  courses Course[]
+  id       String   @id
+  type     Int
+  class    String
+  name     String
+  abstract String
+  credits  Int      @default(0)
+  courses  Course[]
 }
