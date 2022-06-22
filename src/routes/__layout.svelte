@@ -34,7 +34,6 @@
 				search.classList.remove('hidden');
 				if (tab !== 'search') {
 					main.style.opacity = `${0}`;
-					search.style.bottom = `${window.innerHeight - max}px`;
 				}
 				main.classList.replace('transition-none', 'transition-[opacity_0.2s]');
 				aside.classList.replace('transition-none', 'transition-[all_0.2s]');
@@ -50,7 +49,6 @@
 						tab = 'search';
 						main.classList.add('hidden');
 						main.style.opacity = `${0}`;
-						search.style.bottom = `0px`;
 						aside.style.top = `${window.innerHeight}px`;
 						search.classList.replace('opacity-0', 'opacity-100');
 						search.classList.replace('bottom-full', 'bottom-0');
