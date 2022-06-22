@@ -1,5 +1,7 @@
 # ntunhs-courses
 
+![Uptime Robot status](https://img.shields.io/uptimerobot/status/m792062567-a7af76daf343d866dfeccd64)
+
 北護大課程查詢系統
 
 ## Setup
