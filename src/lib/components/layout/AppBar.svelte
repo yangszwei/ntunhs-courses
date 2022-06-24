@@ -9,7 +9,7 @@
 <header class="fixed inset-x-0 top-0 z-30 bg-gray-50">
 	<div class="center h-14">
 		<div class="mx-2 grow">
-			<a class="center gap-2 p-1 text-xl font-medium" href="/">
+			<a class="center w-fit gap-2 p-1 text-xl font-medium" href="/">
 				<img src="/images/favicon-192x192.png" alt="${APP_SHORT_NAME}" class="h-8 w-8" />
 				<span class="hidden lg:block">{APP_NAME}</span>
 				<span class="lg:hidden">{APP_SHORT_NAME}</span>

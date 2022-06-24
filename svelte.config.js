@@ -10,11 +10,6 @@ const config = {
 	],
 	kit: {
 		adapter: adapter(),
-		vite: {
-			server: {
-				hmr: { clientPort: 443 },
-			},
-		},
 	},
 };
 
