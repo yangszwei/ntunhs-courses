@@ -43,6 +43,19 @@ class Sessions extends Array {
 		}
 		return result.join('、');
 	}
+
+	/**
+	 * This creates a Sessions instance from the QueryCourse system export format.
+	 * @param {string} day - A string of the day in the format of '0-6' (Sunday-Saturday).
+	 * @param {string} sess - A comma-separated string of the sessions in the hexadecimal format.
+	 * @returns {Sessions} The created Sessions instance.
+	 */
+	static create(day, sess) {
+		const weekday = (parseInt(day, 10) % 7).toString(10);
+		return new Sessions(
+			...sess.split(',').map((s) => weekday + parseInt(s, 10).toString(16).toUpperCase())
+		);
+	}
 }
 
 export default Sessions;

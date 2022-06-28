@@ -1,6 +1,7 @@
 import Room from '$lib/models/room.js';
 import Semester from '$lib/models/semester.js';
 import Sessions from '$lib/models/sessions.js';
+import { COURSE_SCHEMA } from '$lib/values/system.js';
 
 /** A course that students can enroll in. */
 class Course {
@@ -66,6 +67,36 @@ class Course {
 	/** This returns the subject credits. */
 	get credits() {
 		return this.subject.credits;
+	}
+
+	/**
+	 * This creates a Course instance from the QueryCourse system export format.
+	 * @param {Object} props - A row in the spreadsheet exported from the QueryCourse system.
+	 * @returns {Course} - The created Course instance.
+	 */
+	static create(props) {
+		const semester = props[COURSE_SCHEMA.SEMESTER.remoteName];
+		const sessions = Sessions.create(
+			props[COURSE_SCHEMA.WEEKDAY.remoteName],
+			props[COURSE_SCHEMA.SESSIONS.remoteName]
+		);
+		return new Course({
+			semester: semester.slice(0, 3) + '-' + semester.slice(3),
+			lecturer: props[COURSE_SCHEMA.LECT_NAME.remoteName],
+			lecturers: props[COURSE_SCHEMA.LECT_NAMES.remoteName],
+			subject: {
+				id: props[COURSE_SCHEMA.SUBJ_ID.remoteName],
+				type: parseInt(props[COURSE_SCHEMA.TYPE_ID.remoteName], 10),
+				class: props[COURSE_SCHEMA.OLD_CLASS_NAME.remoteName],
+				name: props[COURSE_SCHEMA.SUBJ_TITLE.remoteName],
+				abstract: props[COURSE_SCHEMA.ABSTRACT.remoteName],
+				credits: parseInt(props[COURSE_SCHEMA.CREDITS.remoteName], 10),
+			},
+			weeks: props[COURSE_SCHEMA.WEEKS.remoteName],
+			sessions: sessions.join(','),
+			room: props[COURSE_SCHEMA.CLASSROOM.remoteName],
+			remark: props[COURSE_SCHEMA.REMARK.remoteName],
+		});
 	}
 }
 
