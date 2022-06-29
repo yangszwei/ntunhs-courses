@@ -10,7 +10,10 @@
 
 ```shell
 docker build -t ntunhs-courses .
-docker run -d --name ntunhs-courses -p 3000:3000 ntunhs-courses
+```
+
+```shell
+docker run -d --cap-add=SYS_ADMIN --init --name ntunhs-courses -p 3000:3000 ntunhs-courses
 ```
 
 ## Links
