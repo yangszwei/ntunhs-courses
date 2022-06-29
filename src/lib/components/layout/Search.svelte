@@ -1,6 +1,6 @@
 <script context="module">
-	import { WEEKDAYS } from '$lib/values/common.js';
 	import { SESSIONS, TYPES } from '$lib/values/course.js';
+	import { WEEKDAYS } from '$lib/values/common.js';
 </script>
 
 <script>

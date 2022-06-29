@@ -13,11 +13,11 @@
 
 <script>
 	import '../app.css';
-	import Icon from '@iconify/svelte';
 	import AppBar from '$lib/components/layout/AppBar.svelte';
 	import CourseCard from '$lib/components/CourseCard.svelte';
-	import Summary from '$lib/components/layout/Summary.svelte';
+	import Icon from '@iconify/svelte';
 	import Search from '$lib/components/layout/Search.svelte';
+	import Summary from '$lib/components/layout/Summary.svelte';
 	import { onMount } from 'svelte';
 
 	/** This controls the active tab in mobile view. */

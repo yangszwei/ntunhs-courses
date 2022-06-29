@@ -1,6 +1,6 @@
 <script context="module">
-	import { WEEKDAYS } from '$lib/values/common.js';
 	import { LEVELS, SESSIONS } from '$lib/values/course.js';
+	import { WEEKDAYS } from '$lib/values/common.js';
 
 	/** This is the number of sessions per day. */
 	const num = Object.keys(SESSIONS).length;

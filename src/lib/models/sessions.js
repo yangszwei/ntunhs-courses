@@ -1,5 +1,5 @@
-import { WEEKDAYS } from '$lib/values/common.js';
 import { SESSIONS } from '$lib/values/course.js';
+import { WEEKDAYS } from '$lib/values/common.js';
 
 /** A collection of sessions. */
 class Sessions extends Array {

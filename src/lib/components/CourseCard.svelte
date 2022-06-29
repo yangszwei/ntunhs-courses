@@ -11,8 +11,8 @@
 </script>
 
 <script>
-	import Icon from '@iconify/svelte';
 	import Card, { states } from '$lib/components/Card.svelte';
+	import Icon from '@iconify/svelte';
 	import Swipe from '$lib/components/Swipe.svelte';
 
 	let card;

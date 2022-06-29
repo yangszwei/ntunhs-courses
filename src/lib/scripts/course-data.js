@@ -1,10 +1,10 @@
-import { existsSync, unlinkSync } from 'fs';
-import { resolve } from 'path';
-import puppeteer from 'puppeteer';
-import Course from '$lib/models/course.js';
 import * as xlsx from '$lib/scripts/xlsx.js';
 import { COURSE_SCHEMA as SCHEMA, SYSTEMS } from '$lib/values/system.js';
+import { existsSync, unlinkSync } from 'fs';
+import Course from '$lib/models/course.js';
 import Sessions from '$lib/models/sessions.js';
+import puppeteer from 'puppeteer';
+import { resolve } from 'path';
 
 /**
  * This extracts the filename from the Content-Disposition header.

@@ -1,7 +1,7 @@
+import { COURSE_SCHEMA } from '$lib/values/system.js';
 import Room from '$lib/models/room.js';
 import Semester from '$lib/models/semester.js';
 import Sessions from '$lib/models/sessions.js';
-import { COURSE_SCHEMA } from '$lib/values/system.js';
 
 /** A course that students can enroll in. */
 class Course {
