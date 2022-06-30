@@ -4,13 +4,12 @@
 
 北護大課程查詢系統
 
-## Setup
+## Set up
 
 ### Docker
 
 ```shell
-docker build -t ntunhs-courses .
-docker run -d --name ntunhs-courses -p 3000:3000 ntunhs-courses
+docker run -d --cap-add=SYS_ADMIN --init --name ntunhs-courses -p 3000:3000 ghcr.io/yangszwei/ntunhs-courses:latest
 ```
 
 ## Links
