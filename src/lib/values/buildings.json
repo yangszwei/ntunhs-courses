@@ -1,0 +1,12 @@
+{
+	"B": { "name_zh": "親仁樓", "name_en": "Benevolence Bldg.", "campus": "m" },
+	"G": { "name_zh": "教學大樓", "name_en": "Teaching Bldg.", "campus": "m" },
+	"S": { "name_zh": "科技大樓", "name_en": "Science & Technology Bldg.", "campus": "m" },
+	"L": { "name_zh": "圖書館", "name_en": "Library", "campus": "m" },
+	"F": { "name_zh": "學思樓", "name_en": "Pondering Bldg.", "campus": "m" },
+	"I": { "name_zh": "樂育樓", "name_en": "Inspiration Bldg.", "campus": "m" },
+	"R": { "name_zh": "長照大樓", "name_en": "Long-Term Care Bldg.", "campus": "c" },
+	"C": { "name_zh": "文教大樓", "name_en": "Literacy and Education Bldg.", "campus": "c" },
+	"m": { "name_zh": "校本部", "name_en": "Main Campus", "default": true },
+	"c": { "name_zh": "城區部", "name_en": "City Branch Campus", "default": false }
+}
